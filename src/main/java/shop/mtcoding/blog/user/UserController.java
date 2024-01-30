@@ -1,9 +1,12 @@
 package shop.mtcoding.blog.user;
 
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+
+import javax.servlet.http.HttpSession;
 
 
 /**
@@ -17,15 +20,13 @@ import org.springframework.web.bind.annotation.PostMapping;
  * 7. DB처리를 원하면 Model(DAO)에게 응답하고 view를 응답하면 끝
  */
 
+@RequiredArgsConstructor
 @Controller
 public class UserController {
 
     // 의존성 주입
-    private UserRepository userRepository;
-
-    public UserController(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    private final UserRepository userRepository;
+    private final HttpSession session;
 
     // 로그인만 select 요청할 때 post매핑함
     // 다른 select 요청은 Get
@@ -39,10 +40,13 @@ public class UserController {
         // 2. 모델 연결 select * from user_tb where username=? and password=?
         User user = userRepository.findByUsernameAndPassword(requestDTO);
 
-        System.out.println(user);
-
-        // 3. 응답 (index)
-        return "redirect:/";
+        if (user == null) {
+            return "error/401";
+        } else {
+            // 해쉬맵(자료구조)
+            session.setAttribute("sessionUser", user);
+            return "redirect:/";
+        }
     }
 
     @PostMapping("/join")
@@ -54,7 +58,7 @@ public class UserController {
         }
 
         // 2. Model에게 DB처리 위임하기
-        userRepository.saveV2(requestDTO); // 의존성 주입해야함
+        userRepository.save(requestDTO); // 의존성 주입해야함
 
 
         System.out.println(requestDTO);
