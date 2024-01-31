@@ -28,6 +28,7 @@ public class UserController {
     private final UserRepository userRepository;
     private final HttpSession session;
 
+
     // 로그인만 select 요청할 때 post매핑함
     // 다른 select 요청은 Get
     @PostMapping("/login")
@@ -57,7 +58,16 @@ public class UserController {
             return "error/400";
         }
 
-        // 2. Model에게 DB처리 위임하기
+        // 2. 동일 username 체크
+        User user = userRepository.findByUsername(requestDTO.getUsername());
+
+        if (user == null) {
+            userRepository.save(requestDTO);
+        } else {
+            return "error/400";
+        }
+
+        // 3. Model에게 위임하기
         userRepository.save(requestDTO); // 의존성 주입해야함
 
 
@@ -83,6 +93,7 @@ public class UserController {
 
     @GetMapping("/logout")
     public String logout() {
+        session.invalidate(); // 세션 서랍을 삭제
         return "redirect:/";
     }
 }
