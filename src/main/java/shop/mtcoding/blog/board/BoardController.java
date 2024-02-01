@@ -3,27 +3,28 @@ package shop.mtcoding.blog.board;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import shop.mtcoding.blog.user.User;
+import org.springframework.web.bind.annotation.RequestParam;
 
+
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Controller
 public class BoardController {
 
     private final HttpSession session;
+    private final BoardRepository boardRepository;
 
+    // http://localhost:8080?page=0
     @GetMapping({ "/", "/board" })
-    public String index() {
 
-//        User sessionUser = (User) session.getAttribute("sessionUser");
-//
-//        if (sessionUser == null) {
-//            System.out.println("로그인 안된 상태입니다.");
-//        } else {
-//            System.out.println("로그인 된 상태입니다.");
-//        }
-
+    // @RequestParam(defaultValue = "0") : 값을 안넣으면 0으로 디폴트를 값을 줌
+    public String index(HttpServletRequest request, @RequestParam(defaultValue = "0") int page) {
+        List<Board> boardList = boardRepository.findAll(1);
+        System.out.println(boardList);
+        request.setAttribute("boardList", boardList);
         return "index";
     }
 
