@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import shop.mtcoding.blog._core.PagingUtil;
 
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,12 +20,22 @@ public class BoardController {
 
     // http://localhost:8080?page=0
     @GetMapping({ "/", "/board" })
-
-    // @RequestParam(defaultValue = "0") : 값을 안넣으면 0으로 디폴트를 값을 줌
     public String index(HttpServletRequest request, @RequestParam(defaultValue = "0") int page) {
-        List<Board> boardList = boardRepository.findAll(1);
-        System.out.println(boardList);
+        List<Board> boardList = boardRepository.findAll(page);
         request.setAttribute("boardList", boardList);
+
+        int currentPage = page;
+        int nextPage = currentPage+1;
+        int prevPage = currentPage-1;
+        request.setAttribute("nextPage", nextPage);
+        request.setAttribute("prevPage", prevPage);
+
+        boolean first = PagingUtil.isFirst(currentPage);
+        boolean last = PagingUtil.isLast(currentPage, 4);
+
+        request.setAttribute("first", first);
+        request.setAttribute("last", last);
+
         return "index";
     }
 
