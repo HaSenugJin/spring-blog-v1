@@ -4,6 +4,7 @@ package shop.mtcoding.blog.board;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
+import shop.mtcoding.blog.user.User;
 
 
 import java.time.LocalDateTime;
@@ -18,7 +19,9 @@ public class Board {
     private int id;
     private String title;
     private String content;
-    private int userId;
+
+    @ManyToOne
+    private User user;
 
     @CreationTimestamp
     private LocalDateTime created_at;
