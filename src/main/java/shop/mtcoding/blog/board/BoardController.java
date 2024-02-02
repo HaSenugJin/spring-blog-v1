@@ -7,13 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
-import shop.mtcoding.blog._core.PagingUtil;
-import shop.mtcoding.blog.user.User;
-import shop.mtcoding.blog.user.UserRepository;
-import shop.mtcoding.blog.user.UserRequest;
-
-
-import java.util.List;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @RequiredArgsConstructor
 @Controller
@@ -21,26 +15,16 @@ public class BoardController {
 
     private final HttpSession session;
     private final BoardRepository boardRepository;
-    private final UserRepository userRepository;
+
+    // 데이터 리선시 (RestController or ResponseBody) - 객체를 리턴하면 스프링이 json으로 변환
+    @GetMapping("/api/board/{id}")
+    public @ResponseBody Board apiBoard(@PathVariable int id) {
+        return boardRepository.findById(id);
+    }
 
     // http://localhost:8080?page=0
-    @GetMapping({ "/", "/board" })
+    @GetMapping({"/", "/board"})
     public String index(HttpServletRequest request, @RequestParam(defaultValue = "0") int page) {
-        List<Board> boardList = boardRepository.findAll(page);
-        request.setAttribute("boardList", boardList);
-
-        int currentPage = page;
-        int nextPage = currentPage+1;
-        int prevPage = currentPage-1;
-        request.setAttribute("nextPage", nextPage);
-        request.setAttribute("prevPage", prevPage);
-
-        boolean first = PagingUtil.isFirst(currentPage);
-        boolean last = PagingUtil.isLast(currentPage, 4);
-
-        request.setAttribute("first", first);
-        request.setAttribute("last", last);
-
         return "index";
     }
 
@@ -51,33 +35,6 @@ public class BoardController {
 
     @GetMapping("/board/{id}")
     public String detail(@PathVariable int id, HttpServletRequest request) {
-
-        BoardResponse.DetailDTO responseDTO = boardRepository.findById(id);
-        request.setAttribute("board", responseDTO);
-
-        // 0. 권환 요청 
-        // 1. 해당 페이지의 주인여부
-        boolean owner = false;
-
-        // 2. 작성자 유저 id 확인하기
-        int boardUserId = responseDTO.getUserId();
-
-
-        // 3. 로그인 여부 체크
-        User sessionUser = (User) session.getAttribute("sessionUser"); // 해쉬맵
-        if (sessionUser != null) { // 로그인 완료
-            if (boardUserId == sessionUser.getId()) {
-                owner = true;
-            }
-        }
-
-        request.setAttribute("owner", owner);
-
-
-
-
-        request.setAttribute("owner", owner);
-
         return "board/detail";
     }
 }
