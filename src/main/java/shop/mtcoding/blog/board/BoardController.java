@@ -55,6 +55,7 @@ public class BoardController {
         BoardResponse.DetailDTO responseDTO = boardRepository.findById(id);
         request.setAttribute("board", responseDTO);
 
+        // 0. 권환 요청 
         // 1. 해당 페이지의 주인여부
         boolean owner = false;
 
