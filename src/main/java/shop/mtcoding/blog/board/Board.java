@@ -8,7 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
-@Data // get, set, toString
+@Data
 @Entity
 @Table(name = "board_tb") // 테이블 이름
 public class Board {
@@ -18,7 +18,7 @@ public class Board {
     private int id;
     private String title;
     private String content;
-    private int user_id;
+    private int userId;
 
     @CreationTimestamp
     private LocalDateTime created_at;
